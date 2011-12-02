@@ -1,10 +1,12 @@
 import dbfuncs, json
 from bottle import route, run, debug, request
 
-# Test page
+######################################
+# Front end
+######################################
 @route('/')
 def index():
-    return "All systems nominal."
+    return open('front-end.html', 'r')
 
 ######################################
 # Tasks
