@@ -1,10 +1,57 @@
 <html>
 <head>
     <title>Front end for task-tracker</title>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+    <script type="text/javascript" src="http://malsup.github.com/jquery.form.js"></script>
+    <script type="text/javascript">
+        function refreshTasks() {
+            $('#task-list').html('');
+            $.get('/task/list', function(data) { displayTaskList(data); });
+        }
+        function displayTaskList(list) {
+            for (i in list.tasks) {
+                var task = list.tasks[i];
+                var star = task.star == 1 ? '★' : '';
+                var row = '<tr><td><input type="checkbox" onclick="completeTask(' + task.id + ')" /></td>' +
+                    '<td>' + star + '</td>' +
+                    '<td>' + task.name + '</td><td>' + task.due + '</td></tr>';
+                $("#task-list").append(row);
+            }
+        }
+        function completeTask(id) {
+            $.get('/task/complete?id=' + id, function(data) { refreshTasks(); });
+        }
+        $(document).ready(function() { 
+            $('#new-task').ajaxForm(function() { 
+                refreshTasks();
+                $('#new-task').hide().each(function() { this.reset() });
+            });
+            refreshTasks();
+        }); 
+        
+    </script>
 </head>
 <body>
-    <h2>task-tracker</h2>
-    This is the front end for task-tracker
+    <h2>task-tracker <a style="font-size: small" href="#" onclick="refreshTasks();">(refresh)</a></h2>
+    <div id="tasks">
+        <table>
+            <thead><td>&nbsp;</td><td>&nbsp;</td><td><strong>Task</strong></td><td><strong>Due</strong></td></thead>
+            <tbody id="task-list"></tbody>
+        </table>
+    </div>
+    <hr />
+    <div id="newtask">
+        <a href="#" onclick="$('#new-task').show()"><strong>Create a new task</strong></a>
+        <form id="new-task" style="display:none" action="/task/create" method="GET">
+            <table>
+                <tr><td><label>Name:</label></td><td><input type="text" name="name" /></td></tr>
+                <tr><td><label>Due:</label></td><td><input type="text" name="due" /></td></tr>
+                <input type="hidden" name="category" value="0" />
+                <tr><td>Starred</td><td><input type="checkbox" name="star" value="true" /></td></tr>
+                <td><td colspan="2"><input type="submit" value="Create" /></td></tr>
+            </table>
+        </form>
+    </div>
 </body>
 </html>
 
