@@ -1,8 +1,17 @@
 import sqlite3
 
+# Dictionary factory instead of the standard row factory
+def dict_factory(cursor, row):
+    d = {}
+    for idx,col in enumerate(cursor.description):
+        d[col[0]] = row[idx]
+    return d
+
 # Gets a connection to the databse
 def getConnection():
-    return sqlite3.connect('db/data.db')
+    conn = sqlite3.connect('db/data.db')
+    conn.row_factory = dict_factory
+    return conn
 
 # Setup the database afresh
 def setup():
@@ -19,16 +28,32 @@ def getAllTasks():
     conn = getConnection()
     c = conn.cursor()
     c.execute('select * from tasks where completed=0')
-    list = []
-    for row in c:
-        (id, name, due, category, star, completed) = row
-        obj = {"id": id, \
-            "name": name, \
-            "due": due, \
-            "category": category, \
-            "star": star \
-        }
-        list.append(obj)
+    list = [row for row in c]
     return list
 
+# Add a new task to the database
+def createTask(name, category, due, star):
+    conn = getConnection()
+    c = conn.cursor()
+    c.execute('insert into tasks values (NULL, ?, ?, ?, ?, 0)',\
+        (name, due, category, star))
+    conn.commit()
+    id = c.lastrowid
+    return getTask(id)
+
+# Get a specific task from the database
+def getTask(id):
+    conn = getConnection()
+    c = conn.cursor()
+    c.execute('select * from tasks where id=%s' % id)
+    list = [row for row in c]
+    return list[0]
+
+# Complete the specified task
+def completeTask(id):
+    conn = getConnection()
+    c = conn.cursor()
+    c.execute('update tasks set completed=1 where id=?', (id))
+    conn.commit()
+    return getTask(id)
 

@@ -1,17 +1,33 @@
 import dbfuncs, json
-from bottle import route, run, debug
+from bottle import route, run, debug, request
 
 # Test page
 @route('/')
 def index():
     return "All systems nominal."
 
-# List page
+######################################
+# Tasks
+######################################
+# List
 @route('/task/list')
 def taskList():
     list = dbfuncs.getAllTasks()
-    return json.JSONEncoder().encode(list)
+    return {"tasks": list}
     
+# Create
+@route('/task/create')
+def taskCreate():
+    name = request.params['name']
+    category = request.params['category']
+    due = request.params['due']
+    star = request.params['star']
+    return dbfuncs.createTask(name, category, due, star)
+# Complete
+@route('/task/complete')
+def taskComplete():
+    id = request.params['id']
+    return dbfuncs.completeTask(id)
 
 # Run the server
 debug(True)
