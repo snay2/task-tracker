@@ -23,6 +23,7 @@ def taskCreate():
     due = request.params['due']
     star = request.params['star']
     return dbfuncs.createTask(name, category, due, star)
+
 # Complete
 @route('/task/complete')
 def taskComplete():

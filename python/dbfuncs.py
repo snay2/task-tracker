@@ -18,8 +18,8 @@ def setup():
     conn = sqlite3.connect('db/data.db')
     c = conn.cursor()
     c.execute('create table if not exists tasks (id integer primary key, name text, due text, category integer, star integer, completed integer)')
-    c.execute('insert into tasks values (NULL, "First task", "", 0, 0, 0)')
-    c.execute('insert into tasks values (NULL, "Second task", "", 0, 0, 0)')
+    #c.execute('insert into tasks values (NULL, "First task", "", 0, 0, 0)')
+    #c.execute('insert into tasks values (NULL, "Second task", "", 0, 0, 0)')
     conn.commit()
     c.close()
 
@@ -27,7 +27,7 @@ def setup():
 def getAllTasks():
     conn = getConnection()
     c = conn.cursor()
-    c.execute('select * from tasks where completed=0')
+    c.execute('select * from tasks where completed=0 order by due')
     list = [row for row in c]
     return list
 
@@ -35,6 +35,8 @@ def getAllTasks():
 def createTask(name, category, due, star):
     conn = getConnection()
     c = conn.cursor()
+    star = 1 if star.lower() == 'true' else 0
+    category = int(category)
     c.execute('insert into tasks values (NULL, ?, ?, ?, ?, 0)',\
         (name, due, category, star))
     conn.commit()
@@ -45,7 +47,7 @@ def createTask(name, category, due, star):
 def getTask(id):
     conn = getConnection()
     c = conn.cursor()
-    c.execute('select * from tasks where id=%s' % id)
+    c.execute('select * from tasks where id=?', (id,))
     list = [row for row in c]
     return list[0]
 
@@ -53,7 +55,7 @@ def getTask(id):
 def completeTask(id):
     conn = getConnection()
     c = conn.cursor()
-    c.execute('update tasks set completed=1 where id=?', (id))
+    c.execute('update tasks set completed=1 where id=?', (id,))
     conn.commit()
     return getTask(id)
 
