@@ -1,4 +1,5 @@
 import sqlite3
+from time import time
 
 # Dictionary factory instead of the standard row factory
 def dict_factory(cursor, row):
@@ -17,12 +18,15 @@ def getConnection():
 def setup():
     conn = sqlite3.connect('db/data.db')
     c = conn.cursor()
-    c.execute('create table if not exists tasks (id integer primary key, name text, due text, category integer, star integer, completed integer)')
-    #c.execute('insert into tasks values (NULL, "First task", "", 0, 0, 0)')
-    #c.execute('insert into tasks values (NULL, "Second task", "", 0, 0, 0)')
+    c.execute('create table if not exists tasks (id integer primary key, name text, due text, category integer, star integer, completed integer, time integer, started integer)')
+    #c.execute('insert into tasks values (NULL, "First task", "", 0, 0, 0, 0, 0)')
+    #c.execute('insert into tasks values (NULL, "Second task", "", 0, 0, 0, 0, 0)')
     conn.commit()
     c.close()
 
+######################################
+# Tasks
+######################################
 # Get all the tasks in an array
 def getAllTasks():
     conn = getConnection()
@@ -36,8 +40,7 @@ def createTask(name, category, due, star):
     conn = getConnection()
     c = conn.cursor()
     star = 1 if star.lower() == 'true' else 0
-    category = int(category)
-    c.execute('insert into tasks values (NULL, ?, ?, ?, ?, 0)',\
+    c.execute('insert into tasks values (NULL, ?, ?, ?, ?, 0, 0, 0)',\
         (name, due, category, star))
     conn.commit()
     id = c.lastrowid
@@ -59,3 +62,38 @@ def completeTask(id):
     conn.commit()
     return getTask(id)
 
+######################################
+# Time
+######################################
+# Add time
+def addTime(taskid, minutes):
+    conn = getConnection()
+    c = conn.cursor()
+    task = getTask(taskid)
+    newtime = int(task['time']) + minutes
+    c.execute('update tasks set time=? where id=?', (newtime, taskid))
+    conn.commit()
+    return getTask(taskid)
+
+# Start time
+def startTime(taskid):
+    conn = getConnection()
+    c = conn.cursor()
+    task = getTask(taskid)
+    if task['started'] != 0:
+        return task
+    c.execute('update tasks set started=? where id=?', (int(time()), taskid))
+    conn.commit()
+    return getTask(taskid)
+
+# Stop time
+def stopTime(taskid):
+    conn = getConnection()
+    c = conn.cursor()
+    task = getTask(taskid)
+    if task['started'] <= 0:
+        return task
+    newtime = int(task['time']) + ((int(time()) - int(task['started'])) / 60)
+    c.execute('update tasks set started=0, time=? where id=?', (newtime, taskid))
+    conn.commit()
+    return getTask(taskid)
