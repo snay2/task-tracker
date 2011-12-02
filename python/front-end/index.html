@@ -63,7 +63,8 @@
         $(document).ready(function() { 
             $('#new-task').ajaxForm(function() { 
                 refreshTasks();
-                $('#new-task').hide().each(function() { this.reset() });
+                $('#new-task').each(function() { this.reset() });
+                $('#create').hide();
             });
             refreshTasks();
         }); 
