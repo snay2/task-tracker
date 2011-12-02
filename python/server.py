@@ -57,4 +57,4 @@ def timeStop():
 
 # Run the server
 debug(True)
-run(host='localhost', port=8080, reloader=True)
+run(host='localhost', port=9467, reloader=True)
