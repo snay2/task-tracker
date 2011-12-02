@@ -24,7 +24,7 @@ def taskCreate():
     name = request.params['name']
     category = int(request.params['category'])
     due = request.params['due']
-    star = request.params['star']
+    star = request.params['star'] if 'star' in request.params.keys() else 'false'
     return dbfuncs.createTask(name, category, due, star)
 
 # Complete

@@ -1,16 +1,31 @@
 <html>
 <head>
     <title>Front end for task-tracker</title>
+
+    <!-- Stylesheet -->
     <style type="text/css">
         body { font-family: consolas, arial, sans-serif; }
         table { border-collapse: collapse; }
         tr.working { background-color: orange; }
         table tr td { padding: 5px 10px; }
         table thead { border-bottom: 2px solid silver; }
-        form#new-task table { border: 2px solid silver; }
+        div#create { border: 2px solid silver; display: none; width: 25%; }
+        div#create p {
+            text-align: center;
+            border-bottom: 2px solid silver;
+            font-weight: bold;
+            margin: 5px;
+            padding: 0 0 5px 0;
+        }
+        div#create table { width: 100%; }
+        div#create tr td+td * { width: 100%; }
     </style>
+    
+    <!-- jQuery and the jQuery Form plugin -->
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
     <script type="text/javascript" src="http://malsup.github.com/jquery.form.js"></script>
+
+    <!-- My functions -->
     <script type="text/javascript">
         function refreshTasks() {
             $('#task-list').html('');
@@ -21,8 +36,8 @@
                 var task = list.tasks[i];
                 var star = task.star == 1 ? '★' : '';
                 var timer = task.started <= 0
-                    ? '<a href="#" onclick="startTimer(' + task.id + ')">Start</a>'
-                    : '<a href="#" onclick="stopTimer(' + task.id + ')">Stop</a>';
+                    ? '<a href="#" onclick="startTimer(' + task.id + ');">Start</a>'
+                    : '<a href="#" onclick="stopTimer(' + task.id + ');">Stop</a>';
                 var checkbox = '<input type="checkbox" onclick="completeTask('
                     + task.id + ')" />';
                 var style = task.started > 0 ? ' class="working"' : '';
@@ -56,7 +71,7 @@
     </script>
 </head>
 <body>
-    <h2>task-tracker <a style="font-size: small" href="#" onclick="refreshTasks();">(refresh)</a></h2>
+    <h2>task-tracker</h2>
     <div id="tasks">
         <table>
             <thead>
@@ -70,18 +85,23 @@
             <tbody id="task-list"></tbody>
         </table>
     </div>
+
     <hr />
-    <div id="newtask">
-        <a href="#" onclick="$('#new-task').show()"><strong>Create a new task</strong></a>
-        <form id="new-task" style="display:none" action="/task/create" method="GET">
+    
+    <div>
+        <p><a href="#" onclick="$('#create').show()">Add task</a></p>
+        <div id="create" style="display:none">
+        <p>New task</p>
+        <form id="new-task" action="/task/create" method="GET">
             <table>
                 <tr><td><label>Name:</label></td><td><input type="text" name="name" /></td></tr>
                 <tr><td><label>Due:</label></td><td><input type="text" name="due" /></td></tr>
                 <input type="hidden" name="category" value="0" />
-                <tr><td>Starred</td><td><input type="checkbox" name="star" value="true" /></td></tr>
-                <td><td colspan="2"><input type="submit" value="Create" /></td></tr>
+                <tr><td>Starred:</td><td><input type="checkbox" name="star" value="true" /></td></tr>
+                <tr><td>&nbsp;</td><td><input type="submit" value="Create" /></td></tr>
             </table>
         </form>
+        </div>
     </div>
 </body>
 </html>
