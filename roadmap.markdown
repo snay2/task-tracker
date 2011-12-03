@@ -28,3 +28,9 @@ Adds the following operations:
 * /category/update
 * /category/archive
 
+## Later versions
+New features:
+
+* Account support (right now the app is single-user with no security)
+* Import/export features (at least for Toodledo, possibly others)
+* Repeating events
